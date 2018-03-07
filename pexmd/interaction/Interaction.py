@@ -4,6 +4,7 @@ Main Interaction module.
 
 import numpy as np
 
+
 class Interaction(object):
   """
   Base Interaction class.
@@ -108,3 +109,67 @@ class LennardJones(ShortRange):
       return ljf
     elif self.shift_style == 'Displace':
       return ljf - vcut
+
+
+
+class Morse(ShortRange):
+    """
+    Morse potential
+    """
+    def __init__(self, types, rcut, bener, beta, shift_style='None'):
+      self.bener = bener
+      self.beta = beta
+      super().__init__(types, rcut, shift_style)
+
+    def forces(self, x, v, t):
+      """
+      Calculate Morse force
+      """
+      x1 = x[t == self.types[0]]
+      x2 = x[t == self.types[1]]
+      i1 = np.arange(len(x))[t == self.types[0]]
+      i2 = np.arange(len(x))[t == self.types[1]]
+      forces = np.zeros_like(x)
+      energ = 0
+
+
+      if self.types[0] == self.types[1]:
+        for i, s1 in enumerate(x1):
+          for j, s2 in enumerate(x2[i+1:]):
+            f = self.pair_force(s1, s2)
+            ii = i1[i]
+            jj = i2[j+i+1]
+            forces[ii] += f
+            forces[jj] -= f
+            energ += self.pair_energ(s1, s2)
+      else:
+        for i, s1 in enumerate(x1):
+          for j, s2 in enumerate(x2):
+            f = self.pair_force(s1, s2)
+            ii = i1[i]
+            jj = i2[j]
+            forces[ii] += f
+            forces[jj] -= f
+            energ += self.pair_energ(s1, s2)
+      return forces, energ
+
+    def pair_force(self, s1, s2):
+      d = np.linalg.norm(s1-s2)
+      if d > self.rcut:
+        return np.zeros_like(s1)
+      mor = 2.0*self.bener*(1.0-np.exp(-self.beta*d))*np.exp(-self.beta*d)*self.beta*(s1-s2)/d
+      if self.shift_style == 'None':
+        return mor
+      elif self.shift_style == 'Displace':
+        return mor
+
+    def pair_energ(self, s1, s2):
+      vcut = 0.0
+      d = np.linalg.norm(s1-s2)
+      if d >= self.rcut:
+        return 0
+      mor = self.bener*(1.0-np.exp(-self.beta*d))**2
+      if self.shift_style == 'None':
+        return mor
+      elif self.shift_style == 'Displace':
+        return mor - vcut
