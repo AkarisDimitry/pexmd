@@ -17,17 +17,22 @@ from pexmd import particles, box, integrator, interaction
 
 import numpy as np
 import math
+import matplotlib
+matplotlib.interactive(True)
 import matplotlib.pyplot as plt
+import threading
+import time
+from mpl_toolkits.mplot3d import axes3d
 
-nparticles = 70
+nparticles = 10
 dt = 0.1
-t_end = 4
-temperature_ini = 10.0
-scale = 100.
+t_end = 10
+temperature_ini = 100.0
+scale = 10.
 
 # Initializing particles:
 positions_ini = np.random.rand(nparticles, 3)
-positions_ini = scale * positions_ini
+positions_ini = scale*3. * positions_ini
 #velocities_ini = np.random.normal(0.,math.sqrt(temperature_ini),size=(nparticles, 3))
 velocities_ini = np.zeros((nparticles, 3), dtype=np.float32)
 masses_ini = np.full((nparticles), 1.)
@@ -52,6 +57,12 @@ lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
 pp = []
 kk = []
 tt = []
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111, projection= '3d')
+ax1.hold(False)
+
+
 for t in np.arange(0, t_end, dt):
   part.x, part.v = evol.first_step(part.x, part.v, part.a)
   part.x, part.v = b.wrap_boundary(part.x, part.v)
@@ -63,13 +74,18 @@ for t in np.arange(0, t_end, dt):
   for vv, m in zip(part.v, part.mass):
     k += np.dot(vv, vv)*m
   k /= 2
-  plt.plot(t, k, 'bo')
-  plt.plot(t, -e + k, 'go')
-  plt.plot(t, -e, 'ro')
-  print(t)
   kk.append(k)
+
+  td = part.x[:, :]
+  ax1.plot(td[:, 0], td[:, 1],td[:,2],'ro')
+  ax1.set(title='', xlabel='X', ylabel='Y', zlabel='Z')
+  ax1.set(xlim=[-scale*3,scale*3], ylim=[-scale*3,scale*3],zlim=[-scale*3,scale*3])
+  fig.canvas.draw()
+  time.sleep(0.01)
+
+
 np.savetxt('pp', pp)
 np.savetxt('kk', kk)
 np.savetxt('tt', tt)
 
-plt.show()
+#plt.show()
