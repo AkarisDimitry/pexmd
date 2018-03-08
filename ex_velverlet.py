@@ -45,22 +45,22 @@ part.t = 1
 part.mass = masses_ini
 
 evol = integrator.VelVerlet(dt)
-#evol = integrator.Andersen(dt, temperature_ini, 10.)
 
 # We should initalize this in a much better way (see #3)
 x0 = np.array([-scale]*3)
 xf = np.array([scale]*3)
 b = box.Box(x0, xf, t='Fixed')
 
-#lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
-lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
+lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
+#lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
 pp = []
 kk = []
 tt = []
 
-fig = plt.figure()
-ax1 = fig.add_subplot(111, projection= '3d')
+fig = plt.figure(figsize=plt.figaspect(0.4))
+ax1 = fig.add_subplot(121, projection= '3d')
 ax1.hold(False)
+ax2 = fig.add_subplot(122)
 
 
 for t in np.arange(0, t_end, dt):
@@ -82,6 +82,12 @@ for t in np.arange(0, t_end, dt):
   ax1.set(xlim=[-scale*3,scale*3], ylim=[-scale*3,scale*3],zlim=[-scale*3,scale*3])
   fig.canvas.draw()
   time.sleep(0.01)
+
+  ax2.plot(t,e,"c-o")
+  ax2.plot(t,k,"m-o")
+  ax2.plot(t,k+e,"y-o")
+  ax2.set(title='', xlabel='Time', ylabel='Energy')
+  ax2.set(xlim=[0.,t_end])
 
 
 np.savetxt('pp', pp)

@@ -165,11 +165,11 @@ class Morse(ShortRange):
         return mor
 
     def pair_energ(self, s1, s2):
-      vcut = self.bener*(1.0-np.exp(-self.beta*(self.rcut-self.blen)))**2
+      vcut = -self.bener*(1.0-np.exp(-self.beta*(self.rcut-self.blen)))**2
       d = np.linalg.norm(s1-s2)
       if d >= self.rcut:
         return 0
-      mor = self.bener*(1.0-np.exp(-self.beta*(d-self.blen)))**2
+      mor = -self.bener*(1.0-np.exp(-self.beta*(d-self.blen)))**2
       if self.shift_style == 'None':
         return mor
       elif self.shift_style == 'Displace':

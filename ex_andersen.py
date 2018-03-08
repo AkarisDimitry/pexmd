@@ -24,10 +24,10 @@ import threading
 import time
 from mpl_toolkits.mplot3d import axes3d
 
-nparticles = 200
+nparticles = 100
 dt = 0.1
 t_end = 20
-temperature_ini = 5000.0
+temperature_ini = 400.0
 scale = 100.
 
 # Initializing particles:
@@ -51,16 +51,18 @@ x0 = np.array([-scale]*3)
 xf = np.array([scale]*3)
 b = box.Box(x0, xf, t='Fixed')
 
-#lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
-lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
+lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
+#lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
 
 pp = []
 kk = []
 tt = []
 
-fig = plt.figure()
-ax1 = fig.add_subplot(111, projection= '3d')
+fig = plt.figure(figsize=plt.figaspect(0.4))
+ax1 = fig.add_subplot(121, projection= '3d')
 ax1.hold(False)
+ax2 = fig.add_subplot(122)
+
 
 for t in np.arange(0, t_end, dt):
   part.x, part.v = evol.first_step(part.x, part.v, part.a)
@@ -78,9 +80,14 @@ for t in np.arange(0, t_end, dt):
   td = part.x[:, :]
   ax1.plot(td[:, 0], td[:, 1],td[:,2],'ro')
   ax1.set(title='', xlabel='X', ylabel='Y', zlabel='Z')
-  ax1.set(xlim=[-scale*3,scale*3], ylim=[-scale*3,scale*3],zlim=[-scale*3,scale*3])
+  ax1.set(xlim=[-scale,scale], ylim=[-scale,scale],zlim=[-scale,scale])
   fig.canvas.draw()
   time.sleep(0.01)
+
+  ax2.plot(t,(2./3.)*k/nparticles,"b-o")
+  ax2.set(title='', xlabel='Time', ylabel='Temperature')
+  ax2.set(xlim=[0.,t_end], ylim=[0.5*temperature_ini,1.5*temperature_ini])
+
 
 np.savetxt('pp', pp)
 np.savetxt('kk', kk)
