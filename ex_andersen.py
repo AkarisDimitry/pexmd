@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 
 nparticles = 70
 dt = 0.1
-t_end = 5
+t_end = 10
 temperature_ini = 10.0
 scale = 100.
 
@@ -46,8 +46,8 @@ x0 = np.array([-scale]*3)
 xf = np.array([scale]*3)
 b = box.Box(x0, xf, t='Fixed')
 
-lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
-#lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, "None")
+#lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
+lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
 
 pp = []
 kk = []
