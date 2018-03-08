@@ -66,5 +66,5 @@ class Andersen(NVT):
     nparticles = len(x)
     if p_i < self.freq * self.dt:
         i_ran = np.random.randint(0,nparticles)
-        v [i_ran, :] = np.random.normal(0.,math.sqrt(self.temperature),size = 3)
+        v [i_ran, :] = np.random.normal(0.,np.sqrt(self.temperature),size = 3)
     return x, v
