@@ -116,9 +116,10 @@ class Morse(ShortRange):
     """
     Morse potential
     """
-    def __init__(self, types, rcut, bener, beta, shift_style='None'):
+    def __init__(self, types, rcut, bener, beta, blen, shift_style='None'):
       self.bener = bener
       self.beta = beta
+      self.blen = blen
       super().__init__(types, rcut, shift_style)
 
     def forces(self, x, v, t):
@@ -157,7 +158,7 @@ class Morse(ShortRange):
       d = np.linalg.norm(s1-s2)
       if d > self.rcut:
         return np.zeros_like(s1)
-      mor = 2.0*self.bener*(1.0-np.exp(-self.beta*d))*np.exp(-self.beta*d)*self.beta*(s1-s2)/d
+      mor = 2.0*self.bener*(1.0-np.exp(-self.beta*(d-self.blen)))*np.exp(-self.beta*(d-self.blen))*self.beta*(s1-s2)/d
       if self.shift_style == 'None':
         return mor
       elif self.shift_style == 'Displace':
@@ -168,7 +169,7 @@ class Morse(ShortRange):
       d = np.linalg.norm(s1-s2)
       if d >= self.rcut:
         return 0
-      mor = self.bener*(1.0-np.exp(-self.beta*d))**2
+      mor = self.bener*(1.0-np.exp(-self.beta*(d-self.blen)))**2
       if self.shift_style == 'None':
         return mor
       elif self.shift_style == 'Displace':
