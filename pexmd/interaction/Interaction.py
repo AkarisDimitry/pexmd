@@ -46,6 +46,38 @@ class ShortRange(Interaction):
     self.shift_style = shift_style
     super().__init__(types)
 
+    def forces(self, x, v, t):
+      """
+        Calculate Lennard-Jones force
+      """
+      x1 = x[t == self.types[0]]
+      x2 = x[t == self.types[1]]
+      i1 = np.arange(len(x))[t == self.types[0]]
+      i2 = np.arange(len(x))[t == self.types[1]]
+      forces = np.zeros_like(x)
+      energ = 0
+      # I have to split it to avoid double-counting. Don't want to get
+      # too fancy since it will change when creating neighbor lists
+      if self.types[0] == self.types[1]:
+        for i, s1 in enumerate(x1):
+          for j, s2 in enumerate(x2[i+1:]):
+            f = self.pair_force(s1, s2)
+            ii = i1[i]
+            jj = i2[j+i+1]
+            forces[ii] += f
+            forces[jj] -= f
+            energ += self.pair_energ(s1, s2)
+      else:
+        for i, s1 in enumerate(x1):
+          for j, s2 in enumerate(x2):
+            f = self.pair_force(s1, s2)
+            ii = i1[i]
+            jj = i2[j]
+            forces[ii] += f
+            forces[jj] -= f
+            energ += self.pair_energ(s1, s2)
+      return forces, energ
+
 
 class LennardJones(ShortRange):
   """
@@ -55,39 +87,6 @@ class LennardJones(ShortRange):
     self.eps = eps
     self.sigma = sigma
     super().__init__(types, rcut, shift_style)
-
-  def forces(self, x, v, t):
-    """
-    Calculate Lennard-Jones force
-    """
-    x1 = x[t == self.types[0]]
-    x2 = x[t == self.types[1]]
-    i1 = np.arange(len(x))[t == self.types[0]]
-    i2 = np.arange(len(x))[t == self.types[1]]
-    forces = np.zeros_like(x)
-    energ = 0
-    # I have to split it to avoid double-counting. Don't want to get
-    # too fancy since it will change when creating neighbor lists
-    if self.types[0] == self.types[1]:
-      for i, s1 in enumerate(x1):
-        for j, s2 in enumerate(x2[i+1:]):
-          f = self.pair_force(s1, s2)
-          ii = i1[i]
-          jj = i2[j+i+1]
-          forces[ii] += f
-          forces[jj] -= f
-          energ += self.pair_energ(s1, s2)
-    else:
-      for i, s1 in enumerate(x1):
-        for j, s2 in enumerate(x2):
-          f = self.pair_force(s1, s2)
-          ii = i1[i]
-          jj = i2[j]
-          forces[ii] += f
-          forces[jj] -= f
-          energ += self.pair_energ(s1, s2)
-    return forces, energ
-
 
   def pair_force(self, s1, s2):
     d = np.linalg.norm(s1-s2)
@@ -121,38 +120,6 @@ class Morse(ShortRange):
       self.beta = beta
       self.blen = blen
       super().__init__(types, rcut, shift_style)
-
-    def forces(self, x, v, t):
-      """
-      Calculate Morse force
-      """
-      x1 = x[t == self.types[0]]
-      x2 = x[t == self.types[1]]
-      i1 = np.arange(len(x))[t == self.types[0]]
-      i2 = np.arange(len(x))[t == self.types[1]]
-      forces = np.zeros_like(x)
-      energ = 0
-
-
-      if self.types[0] == self.types[1]:
-        for i, s1 in enumerate(x1):
-          for j, s2 in enumerate(x2[i+1:]):
-            f = self.pair_force(s1, s2)
-            ii = i1[i]
-            jj = i2[j+i+1]
-            forces[ii] += f
-            forces[jj] -= f
-            energ += self.pair_energ(s1, s2)
-      else:
-        for i, s1 in enumerate(x1):
-          for j, s2 in enumerate(x2):
-            f = self.pair_force(s1, s2)
-            ii = i1[i]
-            jj = i2[j]
-            forces[ii] += f
-            forces[jj] -= f
-            energ += self.pair_energ(s1, s2)
-      return forces, energ
 
     def pair_force(self, s1, s2):
       d = np.linalg.norm(s1-s2)
