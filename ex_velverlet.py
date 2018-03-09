@@ -79,7 +79,7 @@ for t in np.arange(0, t_end, dt):
   td = part.x[:, :]
   ax1.plot(td[:, 0], td[:, 1],td[:,2],'ro')
   ax1.set(title='', xlabel='X', ylabel='Y', zlabel='Z')
-  ax1.set(xlim=[-scale*3,scale*3], ylim=[-scale*3,scale*3],zlim=[-scale*3,scale*3])
+  ax1.set(xlim=[-scale,scale], ylim=[-scale,scale],zlim=[-scale,scale])
   fig.canvas.draw()
   time.sleep(0.01)
 
