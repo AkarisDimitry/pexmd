@@ -24,10 +24,10 @@ import threading
 import time
 from mpl_toolkits.mplot3d import axes3d
 
-nparticles = 100
+nparticles = 80
 dt = 0.1
 t_end = 20
-temperature_ini = 400.0
+temperature_ini = 100.0
 scale = 100.
 
 # Initializing particles:
@@ -49,10 +49,10 @@ evol = integrator.Andersen(dt, temperature_ini, 10.)
 # We should initalize this in a much better way (see #3)
 x0 = np.array([-scale]*3)
 xf = np.array([scale]*3)
-b = box.Box(x0, xf, t='Fixed')
+b = box.Box(x0, xf, t='Periodic')
 
-lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
-#lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
+#lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
+lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
 
 pp = []
 kk = []

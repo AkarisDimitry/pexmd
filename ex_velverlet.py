@@ -24,10 +24,10 @@ import threading
 import time
 from mpl_toolkits.mplot3d import axes3d
 
-nparticles = 10
+nparticles = 20
 dt = 0.1
 t_end = 10
-temperature_ini = 100.0
+temperature_ini = 50.0
 scale = 10.
 
 # Initializing particles:
@@ -51,8 +51,8 @@ x0 = np.array([-scale]*3)
 xf = np.array([scale]*3)
 b = box.Box(x0, xf, t='Fixed')
 
-lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "Displace")
-#lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
+#lj = interaction.LennardJones([1, 1], 5.4, 1.0, 1.0, "None")
+lj = interaction.Morse([1, 1], 5.4, 1.0, 1.0, 1.0, "Displace")
 pp = []
 kk = []
 tt = []
